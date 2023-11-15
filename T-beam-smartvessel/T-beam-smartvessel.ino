@@ -37,7 +37,8 @@ static unsigned int GetAvgSigLevel()
 static void SendLoRaPacket()
 {
   if (gps.date.isValid() && gps.time.isValid() &&
-      gps.location.isValid() && gps.satellites.isValid())
+      gps.location.isValid() && gps.altitude.isValid() &&
+      gps.satellites.isValid())
   {
     char txPacket[128];
     unsigned int dataSize;
@@ -71,7 +72,7 @@ static void SendLoRaPacket()
 static void displayInfo()
 {
   Serial.print("Location: ");
-  if (gps.location.isValid() && gps.satellites.isValid()) {
+  if (gps.location.isValid() && gps.altitude.isValid() && gps.satellites.isValid()) {
     Serial.print("Lat=");
     Serial.print(gps.location.lat(), 6);
     Serial.print(",");
