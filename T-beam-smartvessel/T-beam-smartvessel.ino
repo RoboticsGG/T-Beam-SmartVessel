@@ -9,6 +9,9 @@
 
 #define DEBUG_SERIAL_PRINT
 
+#define GPS_EXT_LED 2  // GPIO 02
+#define TX_EXT_LED  13 // GPIO 13
+
 #define NODE_INFO "A6"
 
 TinyGPSPlus gps;
@@ -31,6 +34,30 @@ static unsigned int GetAvgSigLevel()
   }
 
   return sum / 4;
+}
+
+// RoboticsGG: Update GPS external LED state
+static void UpdateGPSExtLed()
+{
+  bool bGpsOk = (gps.date.isValid() && gps.time.isValid() &&
+                 gps.location.isValid() && gps.altitude.isValid() &&
+                 gps.satellites.isValid());
+
+  digitalWrite(GPS_EXT_LED, bGpsOk ? HIGH : LOW);
+}
+
+// RoboticsGG: Blink LoRa Tx external LED
+static void BlinkTxExtLed()
+{
+  unsigned long startTime;
+
+  digitalWrite(TX_EXT_LED, HIGH);
+
+  // Delay 1 second
+  startTime = millis();
+  while (millis() - startTime < 1000);
+
+  digitalWrite(TX_EXT_LED, LOW);
 }
 
 // RoboticsGG: Send location data via LoRa
@@ -64,6 +91,7 @@ static void SendLoRaPacket()
     memcpy(lora_data, txPacket, dataSize);
     lora_data_size = dataSize;
     loopLMIC();
+    BlinkTxExtLed();
 
     Serial.println(txPacket);
   }
@@ -128,6 +156,12 @@ void setup()
   // When the power is turned on, a delay is required.
   delay(2000);
 
+  // Initialize external LEDs
+  pinMode(GPS_EXT_LED, OUTPUT);
+  pinMode(TX_EXT_LED, OUTPUT);
+  digitalWrite(GPS_EXT_LED, LOW);
+  digitalWrite(TX_EXT_LED, LOW);
+
   // Initialize all the uninitialized TinyGPSCustom objects
   for (int i = 0; i < 4; ++i) {
     snr[i].begin(gps, "GPGSV", 7 + 4 * i); // offsets 7, 11, 15, 19
@@ -145,6 +179,7 @@ void loop()
   while (Serial1.available() > 0) {
     if (gps.encode(Serial1.read())) {
       //displayInfo();
+      UpdateGPSExtLed();
       SendLoRaPacket();
     }
   }
