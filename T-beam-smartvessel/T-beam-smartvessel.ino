@@ -71,7 +71,7 @@ static void SendLoRaPacket()
     unsigned int dataSize;
 
     /* Data order = NodeType, NodeID, YYYY-MM-DD, HH:MM:SS, numSat, sigLevel, Latitude, Longitude, Altitude */
-    snprintf(txPacket, sizeof(txPacket), "%s%04d%02d%02d%02d%02d%02d%03d%03dLat%.6lfLon%.6lfAlt%.6lf",
+    snprintf(txPacket, sizeof(txPacket), "%s%04d%02d%02d%02d%02d%02d%03d%03dLat%.6lfLon%.6lfAlt%.6lfMsgi...T-Beam1.1...",
              NODE_INFO,
              gps.date.year(),
              gps.date.month(),
