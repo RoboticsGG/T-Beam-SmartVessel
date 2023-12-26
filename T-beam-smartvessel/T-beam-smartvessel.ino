@@ -12,7 +12,7 @@
 #define GPS_EXT_LED 2  // GPIO 02
 #define TX_EXT_LED  13 // GPIO 13
 
-#define NODE_INFO "A6"
+#define NODE_INFO "A5"
 
 TinyGPSPlus gps;
 TinyGPSCustom snr[4];
@@ -60,6 +60,19 @@ static void BlinkTxExtLed()
   digitalWrite(TX_EXT_LED, LOW);
 }
 
+// RoboticsGG: Fix busy channel using random delay
+static void DelayBeforeSend()
+{
+  unsigned long delayTime;
+  unsigned long startTime;
+
+  delayTime = random(100, 1000);
+
+  // Delay
+  startTime = millis();
+  while (millis() - startTime < delayTime);
+}
+
 // RoboticsGG: Send location data via LoRa
 static void SendLoRaPacket()
 {
@@ -86,6 +99,9 @@ static void SendLoRaPacket()
              gps.altitude.meters());
 
     dataSize = strlen(txPacket);
+
+    // Fix busy channel
+    DelayBeforeSend();
 
     // Send data to LoRa
     memcpy(lora_data, txPacket, dataSize);
