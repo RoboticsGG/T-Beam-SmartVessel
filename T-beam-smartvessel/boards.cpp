@@ -7,11 +7,6 @@ bool pmuInterrupt;
 SPIClass SDSPI(HSPI);
 #endif
 
-#ifdef HAS_DISPLAY
-extern U8G2_SSD1306_128X64_NONAME_F_HW_I2C *u8g2;
-DISPLAY_MODEL *u8g2 = nullptr;
-#endif
-
 void setPmuFlag() {
   pmuInterrupt = true;
 }
@@ -191,7 +186,6 @@ void disablePeripherals() {
 }
 
 void initBoard() {
-  Serial.begin(115200);
   Serial.println("initBoard");
   SPI.begin(RADIO_SCLK_PIN, RADIO_MISO_PIN, RADIO_MOSI_PIN);
 
